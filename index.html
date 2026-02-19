@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChaMpinSerieS</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+    font-family:'Orbitron',sans-serif;
+    background: radial-gradient(circle at top,#1a1a2e,#0f0f0f);
+    color:white;
+}
+
+header{
+    text-align:center;
+    padding:40px;
+    font-size:2.5rem;
+    font-weight:700;
+    background:linear-gradient(90deg,#00d4ff,#6a00ff);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.container{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:40px;
+    padding:40px 20px;
+}
+
+.card{
+    background:#111;
+    padding:20px;
+    border-radius:15px;
+    width:100%;
+    max-width:600px;
+    box-shadow:0 0 25px rgba(0,212,255,0.2);
+}
+
+h2{
+    text-align:center;
+    margin-bottom:20px;
+    color:#00d4ff;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    padding:8px;
+    text-align:center;
+    border-bottom:1px solid #333;
+}
+
+th{
+    background:#222;
+}
+
+tr:hover{
+    background:#1f1f3a;
+}
+
+.top{
+    background:rgba(0,255,200,0.15);
+}
+
+.rebaixado{
+    background:rgba(255,0,100,0.15);
+}
+
+footer{
+    text-align:center;
+    padding:20px;
+    margin-top:40px;
+    font-size:0.8rem;
+    opacity:0.6;
+}
+</style>
+</head>
+
+<body>
+
+<header>ChaMpinSerieS ⚽</header>
+
+<div class="container">
+    <div class="card">
+        <h2>Série A</h2>
+        <table id="serieA">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Time</th>
+                    <th>Pts</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Série B</h2>
+        <table id="serieB">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Time</th>
+                    <th>Pts</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<footer>
+© 2026 ChaMpinSerieS - Campeonato FIFA/eFootball
+</footer>
+
+<script>
+const serieA = [
+"Alpha","Bravo","Cobra","Delta",
+"Eagle","Falcon","Ghost","Hunter",
+"Iron","Joker","Knight","Lion",
+"Monster","Nitro","Omega","Phoenix"
+];
+
+const serieB = [
+"Rocket","Storm","Titan","Ultra",
+"Venom","Wolf","Xtreme","Yellow",
+"Zeus","Apex","Blaze","Cyber",
+"Dragon","Elite","Force","Galaxy"
+];
+
+function gerarTabela(times, id){
+    const tbody=document.querySelector(`#${id} tbody`);
+    let dados=times.map(t=>({
+        nome:t,
+        pontos:Math.floor(Math.random()*30)
+    }));
+    dados.sort((a,b)=>b.pontos-a.pontos);
+
+    dados.forEach((time,i)=>{
+        const tr=document.createElement("tr");
+        if(i<4)tr.classList.add("top");
+        if(i>=12)tr.classList.add("rebaixado");
+
+        tr.innerHTML=`
+        <td>${i+1}</td>
+        <td>${time.nome}</td>
+        <td>${time.pontos}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+gerarTabela(serieA,"serieA");
+gerarTabela(serieB,"serieB");
+</script>
+
+</body>
+</html>
