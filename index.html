@@ -3,104 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ChaMpinSerieS - Sistema Oficial</title>
+<title>ChaMpinSerieS - Liga Oficial</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{
-    font-family:'Orbitron',sans-serif;
-    background:#0a0a0f;
-    color:white;
-}
-header{
-    padding:20px;
-    text-align:center;
-    font-size:1.8rem;
-    font-weight:900;
-    background:linear-gradient(90deg,#00f5ff,#8a2be2);
-    -webkit-background-clip:text;
-    color:transparent;
-}
-.container{
-    max-width:1200px;
-    margin:auto;
-    padding:20px;
-}
-.section{
-    margin-top:40px;
-}
-h2{
-    margin-bottom:20px;
-    text-align:center;
-}
-form{
-    background:#111;
-    padding:20px;
-    border-radius:12px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    justify-content:center;
-}
-select,input,button{
-    padding:8px;
-    border-radius:8px;
-    border:none;
-}
-button{
-    background:linear-gradient(90deg,#00f5ff,#8a2be2);
-    color:white;
-    cursor:pointer;
-}
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
-    font-size:0.8rem;
-}
-th,td{
-    border-bottom:1px solid #222;
-    padding:6px;
-    text-align:center;
-}
+body{font-family:'Orbitron',sans-serif;background:#0a0a0f;color:white}
+header{text-align:center;padding:20px;font-size:1.8rem;font-weight:900;
+background:linear-gradient(90deg,#00f5ff,#8a2be2);
+-webkit-background-clip:text;color:transparent}
+.container{max-width:1400px;margin:auto;padding:20px}
+h2{text-align:center;margin:40px 0 20px}
+.card{background:#111;padding:20px;border-radius:12px;margin-bottom:40px}
+button{padding:8px 15px;border:none;border-radius:8px;
+background:linear-gradient(90deg,#00f5ff,#8a2be2);color:white;cursor:pointer;margin:5px}
+table{width:100%;border-collapse:collapse;font-size:0.75rem}
+th,td{padding:6px;border-bottom:1px solid #222;text-align:center}
 th{background:#1c1c2e}
 .g4{background:rgba(0,255,150,0.15)}
 .zr{background:rgba(255,0,100,0.15)}
-.card{
-    background:#111;
-    padding:20px;
-    border-radius:12px;
-    margin-bottom:40px;
-}
+.match{display:flex;justify-content:center;align-items:center;gap:5px;margin:5px 0;flex-wrap:wrap}
+input{width:50px;padding:4px;border-radius:5px;border:none;text-align:center}
+.round{margin-bottom:30px;padding:10px;background:#0f0f18;border-radius:8px}
 </style>
 </head>
 <body>
 
-<header>ChaMpinSerieS - Sistema Oficial</header>
+<header>ChaMpinSerieS - Liga Oficial</header>
 
 <div class="container">
 
-<div class="section card">
-<h2>Cadastrar Partida</h2>
-<form id="formJogo">
-<select id="liga">
-<option value="A">Série A</option>
-<option value="B">Série B</option>
-</select>
-
-<select id="time1"></select>
-<input type="number" id="gols1" placeholder="Gols" required min="0">
-
-<select id="time2"></select>
-<input type="number" id="gols2" placeholder="Gols" required min="0">
-
-<button type="submit">Registrar</button>
-<button type="button" onclick="resetar()">Resetar</button>
-</form>
+<div class="card">
+<button onclick="resetar()">Resetar Campeonato</button>
+<button onclick="aplicarPromocao()">Aplicar Promoção/Rebaixamento</button>
 </div>
 
-<div class="section">
 <h2>Tabelas</h2>
 
 <div class="card">
@@ -113,105 +49,150 @@ th{background:#1c1c2e}
 <table id="tabelaB"></table>
 </div>
 
-</div>
+<h2>Calendário - Série A</h2>
+<div id="calendarioA" class="card"></div>
+
+<h2>Calendário - Série B</h2>
+<div id="calendarioB" class="card"></div>
 
 </div>
 
 <script>
+
 const timesA=["Alpha","Bravo","Cobra","Delta","Eagle","Falcon","Ghost","Hunter","Iron","Joker","Knight","Lion","Monster","Nitro","Omega","Phoenix"];
 const timesB=["Rocket","Storm","Titan","Ultra","Venom","Wolf","Xtreme","Yellow","Zeus","Apex","Blaze","Cyber","Dragon","Elite","Force","Galaxy"];
 
-let tabela=JSON.parse(localStorage.getItem("champinseries")) || {
-A:criarTabela(timesA),
-B:criarTabela(timesB)
-};
+let dados=JSON.parse(localStorage.getItem("liga")) || iniciarLiga();
+
+function iniciarLiga(){
+return {
+A:{tabela:criarTabela(timesA),rodadas:gerarRodadas(timesA)},
+B:{tabela:criarTabela(timesB),rodadas:gerarRodadas(timesB)}
+}
+}
 
 function criarTabela(times){
-return times.map(nome=>({
-nome,pts:0,j:0,v:0,e:0,d:0,gp:0,gc:0,sg:0
-}));
+return times.map(nome=>({nome,pts:0,j:0,v:0,e:0,d:0,gp:0,gc:0,sg:0}))
 }
 
-function salvar(){
-localStorage.setItem("champinseries",JSON.stringify(tabela));
+function gerarRodadas(times){
+let lista=[...times];
+let rodadas=[];
+let total=lista.length-1;
+let metade=lista.length/2;
+
+for(let r=0;r<total;r++){
+let rodada=[];
+for(let i=0;i<metade;i++){
+rodada.push({casa:lista[i],fora:lista[lista.length-1-i],g1:null,g2:null});
+}
+lista.splice(1,0,lista.pop());
+rodadas.push(rodada);
+}
+let ida=[...rodadas];
+let volta=rodadas.map(r=>r.map(j=>({casa:j.fora,fora:j.casa,g1:null,g2:null})));
+return [...ida,...volta];
 }
 
-function atualizarSelect(){
-const liga=document.getElementById("liga").value;
-const lista=liga==="A"?timesA:timesB;
+function salvar(){localStorage.setItem("liga",JSON.stringify(dados))}
 
-let t1=document.getElementById("time1");
-let t2=document.getElementById("time2");
+function registrarResultado(liga,rodadaIndex,jogoIndex,g1,g2){
+let jogo=dados[liga].rodadas[rodadaIndex][jogoIndex];
+if(jogo.g1!==null)return;
+jogo.g1=g1;
+jogo.g2=g2;
 
-t1.innerHTML="";
-t2.innerHTML="";
-
-lista.forEach(t=>{
-t1.innerHTML+=`<option>${t}</option>`;
-t2.innerHTML+=`<option>${t}</option>`;
-});
-}
-
-document.getElementById("liga").addEventListener("change",atualizarSelect);
-atualizarSelect();
-
-document.getElementById("formJogo").addEventListener("submit",function(e){
-e.preventDefault();
-
-let liga=document.getElementById("liga").value;
-let time1=document.getElementById("time1").value;
-let time2=document.getElementById("time2").value;
-let gols1=parseInt(document.getElementById("gols1").value);
-let gols2=parseInt(document.getElementById("gols2").value);
-
-if(time1===time2){alert("Times iguais!");return;}
-
-let t1=tabela[liga].find(t=>t.nome===time1);
-let t2=tabela[liga].find(t=>t.nome===time2);
+let t1=dados[liga].tabela.find(t=>t.nome===jogo.casa);
+let t2=dados[liga].tabela.find(t=>t.nome===jogo.fora);
 
 t1.j++;t2.j++;
-t1.gp+=gols1;t1.gc+=gols2;
-t2.gp+=gols2;t2.gc+=gols1;
+t1.gp+=g1;t1.gc+=g2;
+t2.gp+=g2;t2.gc+=g1;
 t1.sg=t1.gp-t1.gc;
 t2.sg=t2.gp-t2.gc;
 
-if(gols1>gols2){t1.v++;t1.pts+=3;t2.d++}
-else if(gols2>gols1){t2.v++;t2.pts+=3;t1.d++}
+if(g1>g2){t1.v++;t1.pts+=3;t2.d++}
+else if(g2>g1){t2.v++;t2.pts+=3;t1.d++}
 else{t1.e++;t2.e++;t1.pts++;t2.pts++}
 
 salvar();
 render();
-this.reset();
-});
+}
 
-function render(){
-["A","B"].forEach(liga=>{
-let dados=tabela[liga].sort((a,b)=>b.pts-a.pts||b.sg-a.sg||b.gp-a.gp);
-let html=`<tr>
-<th>#</th><th>Time</th><th>PTS</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th>
-</tr>`;
-dados.forEach((t,i)=>{
-let classe="";
-if(i<4)classe="g4";
-if(i>=12)classe="zr";
-html+=`<tr class="${classe}">
+function renderTabela(liga){
+let tabela=dados[liga].tabela.sort((a,b)=>b.pts-a.pts||b.sg-a.sg||b.gp-a.gp);
+let html=`<tr><th>#</th><th>Time</th><th>PTS</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th></tr>`;
+tabela.forEach((t,i)=>{
+let cls="";
+if(i<4)cls="g4";
+if(i>=12)cls="zr";
+html+=`<tr class="${cls}">
 <td>${i+1}</td><td>${t.nome}</td><td>${t.pts}</td>
 <td>${t.j}</td><td>${t.v}</td><td>${t.e}</td><td>${t.d}</td>
-<td>${t.gp}</td><td>${t.gc}</td><td>${t.sg}</td>
-</tr>`;
+<td>${t.gp}</td><td>${t.gc}</td><td>${t.sg}</td></tr>`;
 });
 document.getElementById("tabela"+liga).innerHTML=html;
+}
+
+function renderCalendario(liga){
+let container=document.getElementById("calendario"+liga);
+container.innerHTML="";
+dados[liga].rodadas.forEach((rodada,i)=>{
+let div=document.createElement("div");
+div.className="round";
+div.innerHTML=`<h4>Rodada ${i+1}</h4>`;
+rodada.forEach((j,jIndex)=>{
+let match=document.createElement("div");
+match.className="match";
+if(j.g1===null){
+match.innerHTML=`
+${j.casa}
+<input type="number" min="0" onchange="registrarResultado('${liga}',${i},${jIndex},this.value, this.nextElementSibling.value)">
+x
+<input type="number" min="0" onchange="registrarResultado('${liga}',${i},${jIndex}, this.previousElementSibling.value,this.value)">
+${j.fora}
+`;
+}else{
+match.innerHTML=`${j.casa} ${j.g1} x ${j.g2} ${j.fora}`;
+}
+div.appendChild(match);
+});
+container.appendChild(div);
 });
 }
 
+function aplicarPromocao(){
+let a=dados.A.tabela.sort((a,b)=>b.pts-a.pts);
+let b=dados.B.tabela.sort((a,b)=>b.pts-a.pts);
+
+let rebaixados=a.slice(12);
+let promovidos=b.slice(0,4);
+
+alert("Promoção e Rebaixamento Aplicados!");
+
+dados.A= {tabela:criarTabela([...a.slice(0,12).map(t=>t.nome),...promovidos.map(t=>t.nome)]),rodadas:gerarRodadas([...a.slice(0,12).map(t=>t.nome),...promovidos.map(t=>t.nome)])};
+dados.B= {tabela:criarTabela([...b.slice(4).map(t=>t.nome),...rebaixados.map(t=>t.nome)]),rodadas:gerarRodadas([...b.slice(4).map(t=>t.nome),...rebaixados.map(t=>t.nome)])};
+
+salvar();
+render();
+}
+
 function resetar(){
-if(confirm("Tem certeza que deseja resetar o campeonato?")){
-localStorage.removeItem("champinseries");
+if(confirm("Resetar campeonato completo?")){
+localStorage.removeItem("liga");
 location.reload();
 }
 }
 
+function render(){
+renderTabela("A");
+renderTabela("B");
+renderCalendario("A");
+renderCalendario("B");
+}
+
 render();
+
 </script>
 
 </body>
